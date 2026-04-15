@@ -1,147 +1,202 @@
 # pbix-mapper
 
-> *"O mapa nao e o territorio, mas sem mapa voce esta perdido."*
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-2.0-150458?style=flat-square&logo=pandas&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-Interface_Web-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
+![License](https://img.shields.io/badge/Licenca-GPL--3.0-blue?style=flat-square)
 
-Extract and map all data sources from Power BI (`.pbix`) files. Feed it a PBIX, get a structured de-para of every connection, table, and parameter.
+Ferramenta CLI + interface web para **extrair e mapear todas as fontes de dados de arquivos Power BI (.pbix)**. Joga um PBIX, sai o de-para estruturado de cada conexao, tabela e parametro.
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-green.svg)
-![Status](https://img.shields.io/badge/Status-Alpha-orange.svg)
-
----
-
-## Why
-
-Power BI files are opaque binaries. When you need to migrate reports, audit data sources, or understand what a dashboard actually consumes, you're stuck clicking through Power Query editor one table at a time.
-
-**pbix-mapper** cracks open the PBIX, extracts every Power Query M expression, parses the connection patterns, resolves parameters, and gives you a clean, structured mapping of all data sources.
+Projeto real de engenharia de dados aplicada ao ciclo de **migracao de relatorios Power BI**: **extracao de fontes -> cruzamento com servidor -> enriquecimento -> comunicacao**.
 
 ---
 
-## Install
-
-```bash
-pip install pbix-mapper
-```
-
-Or from source:
+## Quick Start
 
 ```bash
 git clone https://github.com/andrefarias/pbix-mapper.git
 cd pbix-mapper
 pip install -e .
-```
 
----
+# Extrair fontes de um PBIX
+pbix-mapper extract relatorio.pbix
 
-## Usage
+# Extrair de um diretorio inteiro, salvar em CSV
+pbix-mapper extract ./relatorios/ --format csv --real-only -o fontes.csv
 
-### Terminal table (default)
-
-```bash
-pbix-mapper extract report.pbix
-```
-
-### CSV output
-
-```bash
-pbix-mapper extract report.pbix --format csv --output sources.csv
-```
-
-### JSON output
-
-```bash
-pbix-mapper extract ./my_reports/ --format json --output sources.json
-```
-
-### Real sources only (exclude embedded/derived tables)
-
-```bash
-pbix-mapper extract report.pbix --real-only
-```
-
-### Verbose mode
-
-```bash
-pbix-mapper extract report.pbix -v
-```
-
-### Cross-reference with server file tree
-
-```bash
-pbix-mapper extract ./reports/ --format csv --real-only -o sources.csv
-pbix-mapper crossref sources.csv --tree server_tree.txt -o crossref.csv
-```
-
-### Enrich with Excel metadata
-
-```bash
-pbix-mapper enrich sources.csv --excel schedule.xlsx --match-column "Dashboard" --source-column "Data Source" --header-row 1 --ffill "Dashboard" -o enriched.csv
-```
-
-### Generate communication messages
-
-```bash
-pbix-mapper messages sources.csv --config groups.yaml -o messages.md
-```
-
-### Launch web interface
-
-```bash
-pip install pbix-mapper[web]
+# Abrir interface web
+pip install -e ".[web]"
 pbix-mapper web
 ```
 
 ---
 
-## What it extracts
+## CLI -- 6 Comandos
 
-For each query/table in the PBIX, pbix-mapper identifies:
+```
+pbix-mapper extract    Extrair fontes de dados de arquivos .pbix
+pbix-mapper crossref   Cruzar fontes com tree de servidor de arquivos
+pbix-mapper enrich     Enriquecer com metadados de planilha Excel
+pbix-mapper messages   Gerar mensagens Teams/email via template YAML
+pbix-mapper web        Abrir interface web local (Streamlit)
+pbix-mapper version    Versao
+```
 
-| Field | Description |
-|---|---|
-| **report** | Name of the PBIX file |
-| **query_name** | Power Query table/query name |
-| **connection_type** | SharePoint, Oracle, SQL Server, Excel, Folder, API/Web, OData, ODBC |
-| **origin** | Connection string, URL, file path |
-| **table_or_query** | Sheet name, SQL query, database name |
-| **is_real_source** | `True` for external connectors, `False` for embedded/derived |
-| **subfolder** | SharePoint subfolder path (if applicable) |
-| **file_format** | Excel, CSV, TXT, etc. |
+### Pipeline tipico
 
-### Supported connection types
-
-- SharePoint.Files
-- Oracle.Database
-- Sql.Database
-- Folder.Files
-- File.Contents / Excel.Workbook
-- Csv.Document
-- Web.Contents
-- OData.Feed
-- Odbc.Query
+```
+pbix-mapper extract ./relatorios/ -f csv --real-only -o fontes.csv
+pbix-mapper crossref fontes.csv --tree server_tree.txt -o cruzado.csv
+pbix-mapper enrich cruzado.csv -e planilha.xlsx -m "Dashboard" -s "Fonte" -o final.csv
+pbix-mapper messages final.csv --config grupos.yaml -o mensagens.md
+```
 
 ---
 
-## How it works
+## Interface Web
 
-1. PBIX files are ZIP archives containing a `DataModel` binary (ABF/XPress9 compressed)
-2. [pbixray](https://github.com/pbi-tools/pbixray) decompresses and extracts Power Query M expressions
-3. pbix-mapper parses the M code with regex to classify each data source
-4. Parameters (`Path_*`) are resolved to their actual values
-5. Output is structured as flat CSV/JSON or a rich terminal table
+```
++------------------------------------------------------------------+
+| pbix-mapper                                                       |
++------------------------------------------------------------------+
+| [SIDEBAR]              | [SOURCES]  [CROSS-REF]  [EXPORT]        |
+|                        |                                          |
+| Upload PBIX            | +------+--------+--------+--------+     |
+| [arquivo.pbix]    [x]  | |Report|Query   |Type    |Origin  |     |
+| [vendas.pbix]     [x]  | |------|--------|--------|--------|     |
+|                        | |Vendas|D_PARA  |SharePt.|https://|     |
+| Server Tree (opcional) | |Vendas|Metas   |SharePt.|https://|     |
+| [tree.txt]        [x]  | |Funil |FactCon.|Excel   |C:\Us...|     |
+|                        | +------+--------+--------+--------+     |
+| [x] Real sources only  |                                          |
+|                        | +--------+ +--------+ +--------+        |
+|                        | |Reports | |Real    | |Total   |        |
+|                        | |   4    | |  30    | |  42    |        |
+|                        | +--------+ +--------+ +--------+        |
++------------------------------------------------------------------+
+```
+
+- Upload de PBIX (multiplos arquivos)
+- Tabela interativa com filtros por relatorio e tipo de conexao
+- Cross-reference com tree de servidor (upload opcional)
+- Export: CSV e JSON
 
 ---
 
-## Roadmap
+## Destaques Tecnicos
 
-- [x] **Sprint 1** — Core extraction + CLI (CSV, JSON, table)
-- [x] **Sprint 2** — Cross-reference with server file trees + Excel enrichment
-- [x] **Sprint 3** — Local web interface (Streamlit)
-- [x] **Sprint 4** — Communication template generator (Teams/email)
+O que este projeto demonstra:
+
+- **Extracao de PBIX** -- abre o binario DataModel (ABF/XPress9) via pbixray, extrai codigo Power Query M e classifica cada conector
+- **10 tipos de conexao** -- SharePoint, Oracle, SQL Server, Folder, Excel, CSV, Web/API, OData, ODBC, File local
+- **Resolucao de parametros** -- parametros Path_* sao resolvidos para seus valores reais, reconstruindo a origem completa
+- **Cruzamento com servidor** -- valida se os caminhos extraidos existem no file system corporativo, detecta padrao de dump diario
+- **Fuzzy matching** -- enriquecimento com planilhas Excel usando correspondencia aproximada (difflib.SequenceMatcher)
+- **Gerador de mensagens** -- templates Jinja2 configuraveis via YAML para comunicacao Teams/email com tabelas de de-para
+- **Interface web** -- Streamlit com upload, filtros interativos e export
+- **CLI composavel** -- cada comando aceita entrada do anterior via CSV, permitindo pipelines flexiveis
+- **51 testes unitarios** -- cobertura das funcoes de parsing, classificacao, cruzamento e matching
+- **Zero dependencia de GUI** -- funciona 100% no terminal, interface web e opcional
 
 ---
 
-## License
+## Tecnologias
 
-GPL-3.0-or-later. See [LICENSE](../LICENSE).
+| Camada | Stack |
+|--------|-------|
+| Extracao | Python, pbixray (decompressao XPress9) |
+| Parsing | Regex sobre codigo Power Query M |
+| Cruzamento | Busca em file tree com deteccao de dump diario |
+| Enriquecimento | Pandas, difflib (fuzzy matching) |
+| Mensagens | Jinja2, PyYAML |
+| Interface Web | Streamlit |
+| CLI | Typer, Rich (tabelas formatadas) |
+| Testes | pytest |
+
+---
+
+## Arquitetura
+
+```
+              Arquivo .pbix (ZIP -> DataModel -> ABF/XPress9)
+                        |
+                  [pbixray.PBIXRay]
+                  decompressao + extracao de M code
+                        |
+                  [extractor.py]
+                  regex parsing dos conectores
+                  resolucao de parametros Path_*
+                  classificacao: real vs embutido
+                        |
+          +-------------+-------------+
+          |             |             |
+    [formatters.py] [cross_ref.py] [enricher.py]
+    CSV / JSON /    cruzamento     fuzzy match
+    tabela Rich     com tree.txt   com Excel
+          |             |             |
+          +-------> CSV enriquecido --+
+                        |
+              +---------+---------+
+              |                   |
+        [Streamlit]         [messenger.py]
+        interface web       Jinja2 + YAML
+        upload + filtros    mensagens Teams
+```
+
+---
+
+## Conectores Suportados
+
+| Padrao no Power Query M | Tipo |
+|-------------------------|------|
+| `SharePoint.Files(url)` | SharePoint |
+| `Oracle.Database(server)` | Oracle |
+| `Sql.Database(server, db)` | SQL Server |
+| `Folder.Files(path)` | Pasta de rede |
+| `Excel.Workbook(File.Contents(path))` | Excel local |
+| `Csv.Document(File.Contents(path))` | CSV local |
+| `File.Contents(path)` | Arquivo local |
+| `Web.Contents(url)` | API / Web |
+| `OData.Feed(url)` | OData |
+| `Odbc.Query(dsn, query)` | ODBC |
+
+---
+
+## Estrutura do Projeto
+
+```
+pbix-mapper/
+  src/
+    pbix_mapper/
+      __init__.py            # Versao
+      cli.py                 # 6 comandos Typer
+      extractor.py           # Core: parsing de Power Query M
+      models.py              # Dataclasses Source e Report
+      formatters.py          # Saida CSV, JSON, tabela Rich
+      cross_ref.py           # Cruzamento com file tree
+      enricher.py            # Fuzzy matching com Excel
+      messenger.py           # Gerador de mensagens Jinja2
+      templates/
+        message.md.j2        # Template de mensagem
+        example_config.yaml  # Config YAML de exemplo
+      web/
+        app.py               # Interface Streamlit
+  tests/
+    test_extractor.py        # 23 testes do parser
+    test_cross_ref.py        # 15 testes do cruzamento
+    test_enricher.py         # 13 testes do matching
+  docs/
+    README.md
+  pyproject.toml
+  LICENSE                    # GPL-3.0
+```
+
+---
+
+## Licenca
+
+GPL-3.0-or-later
+
+---
+
+*"O mapa nao e o territorio, mas sem mapa voce esta perdido."*
