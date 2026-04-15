@@ -1,0 +1,31 @@
+# pbix-mapper message generator config
+# Copy this file and customize for your organization.
+
+greeting: "Hi team, good morning."
+
+intro_template: >
+  We are migrating the report **{report}** to the corporate Fabric workspace.
+  Below is the data source mapping extracted directly from the PBIX.
+  Please validate before we proceed.
+
+questions:
+  - "Is this mapping correct? Are there any missing sources?"
+  - "Are any of these sources updated manually? Which ones?"
+  - "Have there been recent changes to column structure, file names, or folder paths?"
+
+closing: "Thanks."
+
+groups:
+  - name: "[Company] Sales Report"
+    report: "Sales"
+    members:
+      - john@company.com
+      - jane@company.com
+    extra_questions:
+      - "Are the daily dump processes active and running normally?"
+
+  - name: "[Company] Billing Report"
+    report: "Billing"
+    members:
+      - bob@company.com
+      - alice@company.com

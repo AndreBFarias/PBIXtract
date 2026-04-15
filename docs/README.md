@@ -66,6 +66,32 @@ pbix-mapper extract report.pbix --real-only
 pbix-mapper extract report.pbix -v
 ```
 
+### Cross-reference with server file tree
+
+```bash
+pbix-mapper extract ./reports/ --format csv --real-only -o sources.csv
+pbix-mapper crossref sources.csv --tree server_tree.txt -o crossref.csv
+```
+
+### Enrich with Excel metadata
+
+```bash
+pbix-mapper enrich sources.csv --excel schedule.xlsx --match-column "Dashboard" --source-column "Data Source" --header-row 1 --ffill "Dashboard" -o enriched.csv
+```
+
+### Generate communication messages
+
+```bash
+pbix-mapper messages sources.csv --config groups.yaml -o messages.md
+```
+
+### Launch web interface
+
+```bash
+pip install pbix-mapper[web]
+pbix-mapper web
+```
+
 ---
 
 ## What it extracts
@@ -110,9 +136,9 @@ For each query/table in the PBIX, pbix-mapper identifies:
 ## Roadmap
 
 - [x] **Sprint 1** — Core extraction + CLI (CSV, JSON, table)
-- [ ] **Sprint 2** — Cross-reference with server file trees + Excel enrichment
-- [ ] **Sprint 3** — Local web interface (Streamlit)
-- [ ] **Sprint 4** — Communication template generator (Teams/email)
+- [x] **Sprint 2** — Cross-reference with server file trees + Excel enrichment
+- [x] **Sprint 3** — Local web interface (Streamlit)
+- [x] **Sprint 4** — Communication template generator (Teams/email)
 
 ---
 

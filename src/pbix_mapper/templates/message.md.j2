@@ -1,0 +1,31 @@
+{% for group in groups %}
+---
+
+## {{ group.name }}
+
+**Members:**
+{{ group.members | join('; ') }}
+
+**Message:**
+
+{{ greeting }}
+
+{{ intro_template | replace('{report}', group.report) }}
+
+**Data source mapping:**
+
+| # | Source in Power BI | Type | Origin | Table/Sheet | Format | Server Path | Status |
+|---|---|---|---|---|---|---|---|
+{% for src in group.sources -%}
+| {{ loop.index }} | {{ src.query_name }} | {{ src.connection_type }} | {{ src.origin[:60] }} | {{ src.table_or_query }} | {{ src.file_format }} | {{ src.server_path | default('--') }} | {{ 'Identified' if src.path_found | default(false) else '**NOT IDENTIFIED**' }} |
+{% endfor %}
+{% for question in questions %}
+{{ loop.index }}. {{ question }}
+{% endfor %}
+{% for question in group.extra_questions | default([]) %}
+{{ questions | length + loop.index }}. {{ question }}
+{% endfor %}
+
+{{ closing }}
+
+{% endfor %}
