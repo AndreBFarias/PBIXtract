@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pbix-mapper"
+name = "PBIXtract"
 version = "0.1.0"
 description = "Extract and map all data sources from Power BI (.pbix) files"
 readme = "docs/README.md"
@@ -44,11 +44,11 @@ dev = [
 ]
 
 [project.scripts]
-pbix-mapper = "pbix_mapper.cli:app"
+PBIXtract = "pbix_mapper.cli:app"
 
 [project.urls]
-Repository = "https://github.com/andrefarias/pbix-mapper"
-Issues = "https://github.com/andrefarias/pbix-mapper/issues"
+Repository = "https://github.com/andrefarias/PBIXtract"
+Issues = "https://github.com/andrefarias/PBIXtract/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pbix_mapper"]

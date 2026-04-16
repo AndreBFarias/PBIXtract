@@ -1,4 +1,4 @@
-# pbix-mapper
+# PBIXtract
 
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-2.0-150458?style=flat-square&logo=pandas&logoColor=white)
@@ -14,19 +14,19 @@ Projeto real de engenharia de dados aplicada ao ciclo de **migracao de relatorio
 ## Quick Start
 
 ```bash
-git clone https://github.com/andrefarias/pbix-mapper.git
-cd pbix-mapper
+git clone https://github.com/andrefarias/PBIXtract.git
+cd PBIXtract
 pip install -e .
 
 # Extrair fontes de um PBIX
-pbix-mapper extract relatorio.pbix
+PBIXtract extract relatorio.pbix
 
 # Extrair de um diretorio inteiro, salvar em CSV
-pbix-mapper extract ./relatorios/ --format csv --real-only -o fontes.csv
+PBIXtract extract ./relatorios/ --format csv --real-only -o fontes.csv
 
 # Abrir interface web
 pip install -e ".[web]"
-pbix-mapper web
+PBIXtract web
 ```
 
 ---
@@ -34,21 +34,21 @@ pbix-mapper web
 ## CLI -- 6 Comandos
 
 ```
-pbix-mapper extract    Extrair fontes de dados de arquivos .pbix
-pbix-mapper crossref   Cruzar fontes com tree de servidor de arquivos
-pbix-mapper enrich     Enriquecer com metadados de planilha Excel
-pbix-mapper messages   Gerar mensagens Teams/email via template YAML
-pbix-mapper web        Abrir interface web local (Streamlit)
-pbix-mapper version    Versao
+PBIXtract extract    Extrair fontes de dados de arquivos .pbix
+PBIXtract crossref   Cruzar fontes com tree de servidor de arquivos
+PBIXtract enrich     Enriquecer com metadados de planilha Excel
+PBIXtract messages   Gerar mensagens Teams/email via template YAML
+PBIXtract web        Abrir interface web local (Streamlit)
+PBIXtract version    Versao
 ```
 
 ### Pipeline tipico
 
 ```
-pbix-mapper extract ./relatorios/ -f csv --real-only -o fontes.csv
-pbix-mapper crossref fontes.csv --tree server_tree.txt -o cruzado.csv
-pbix-mapper enrich cruzado.csv -e planilha.xlsx -m "Dashboard" -s "Fonte" -o final.csv
-pbix-mapper messages final.csv --config grupos.yaml -o mensagens.md
+PBIXtract extract ./relatorios/ -f csv --real-only -o fontes.csv
+PBIXtract crossref fontes.csv --tree server_tree.txt -o cruzado.csv
+PBIXtract enrich cruzado.csv -e planilha.xlsx -m "Dashboard" -s "Fonte" -o final.csv
+PBIXtract messages final.csv --config grupos.yaml -o mensagens.md
 ```
 
 ---
@@ -57,7 +57,7 @@ pbix-mapper messages final.csv --config grupos.yaml -o mensagens.md
 
 ```
 +------------------------------------------------------------------+
-| pbix-mapper                                                       |
+| PBIXtract                                                       |
 +------------------------------------------------------------------+
 | [SIDEBAR]              | [SOURCES]  [CROSS-REF]  [EXPORT]        |
 |                        |                                          |
@@ -165,7 +165,7 @@ O que este projeto demonstra:
 ## Estrutura do Projeto
 
 ```
-pbix-mapper/
+PBIXtract/
   src/
     pbix_mapper/
       __init__.py            # Versao
