@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "PBIXtract"
 version = "0.1.0"
 description = "Extract and map all data sources from Power BI (.pbix) files"
-readme = "docs/README.md"
+readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.11"
 authors = [
