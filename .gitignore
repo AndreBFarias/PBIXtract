@@ -28,3 +28,21 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# --- anti-IA (anonimato local) ---
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+COPILOT.md
+HANDOFF-PROMPT.md
+HANDOFF.md
+HOW_TO_RESUME.md
+VALIDATOR_BRIEF.md
+STATE.md
+.cursorrules
+.windsurfrules
+.claude/
+.cursor/
+.aider*
+.continue/
+.github/copilot-instructions.md
